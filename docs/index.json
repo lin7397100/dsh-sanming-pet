@@ -1,0 +1,81 @@
+{
+  "format": 1,
+  "title": {
+    "en": "Sanming Culture & Tourism Park",
+    "zh": "三明文旅乐园"
+  },
+  "description": {
+    "en": "Desktop pets, map tour and check-in features for DSH.",
+    "zh": "三明文旅乐园：桌面宠物、地图巡游与打卡成就。"
+  },
+  "metadata": {
+    "categories": {
+      "pet": {
+        "title": {
+          "en": "Desktop pets",
+          "zh": "桌面宠物"
+        }
+      },
+      "fun": {
+        "title": {
+          "en": "Fun & games",
+          "zh": "娱乐互动"
+        }
+      }
+    },
+    "labels": {
+      "sanming": {
+        "title": {
+          "en": "Sanming",
+          "zh": "三明"
+        }
+      },
+      "chibi": {
+        "title": {
+          "en": "3D chibi",
+          "zh": "3D 手办质感"
+        }
+      }
+    }
+  },
+  "plugins": [
+    {
+      "name": "dsh-sanming-pet",
+      "title": {
+        "en": "Sanming Culture & Tourism Park",
+        "zh": "三明文旅乐园"
+      },
+      "description": {
+        "en": "Three 3D chibi pets (Mingqiqi / Minglingling / Mingbaobao), hand-drawn map tour over 11 counties, check-in stamps, achievements, skins, album, floating desktop pet with drag / click-to-talk / settings, plus knowledge-base Q&A.",
+        "zh": "明奇奇、明灵灵、明宝宝三只 3D 手办质感宠物，配手绘三明地图巡游、11 个区县景区、打卡印章、成就、皮肤、相册、漫游引导，另有常驻悬浮桌宠（可拖拽、点击对话、设置页）与本地知识库问答。"
+      },
+      "icon": "icon.png",
+      "author": "林啟西",
+      "homepage": "https://github.com/GITHUB_USER/dsh-sanming-pet#readme",
+      "repository": {
+        "url": "https://github.com/GITHUB_USER/dsh-sanming-pet"
+      },
+      "metadata": {
+        "category": "pet",
+        "labels": [
+          "sanming",
+          "chibi"
+        ]
+      },
+      "versions": [
+        {
+          "version": "1.9.0",
+          "publishTimestamp": 1794931200,
+          "source": {
+            "type": "git",
+            "url": "https://github.com/GITHUB_USER/dsh-sanming-pet",
+            "commit": "39b22d62792fcafe75bcafab50e73ea1b8af0c32"
+          },
+          "engines": {
+            "dsh": ">=0.2.0-rc.2"
+          }
+        }
+      ]
+    }
+  ]
+}
