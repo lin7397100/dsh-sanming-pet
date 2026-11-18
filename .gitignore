@@ -1,0 +1,13 @@
+# 依赖与打包产物
+node_modules/
+*.tgz
+
+# 系统垃圾
+.DS_Store
+Thumbs.db
+*.log
+
+# 临时目录
+_tmp/
+_release/
+_release-win/

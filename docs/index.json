@@ -51,9 +51,9 @@
       },
       "icon": "icon.png",
       "author": "林啟西",
-      "homepage": "https://github.com/GITHUB_USER/dsh-sanming-pet#readme",
+      "homepage": "https://github.com/lin7397100/dsh-sanming-pet#readme",
       "repository": {
-        "url": "https://github.com/GITHUB_USER/dsh-sanming-pet"
+        "url": "https://github.com/lin7397100/dsh-sanming-pet"
       },
       "metadata": {
         "category": "pet",
@@ -64,11 +64,11 @@
       },
       "versions": [
         {
-          "version": "1.9.0",
+          "version": "1.9.3",
           "publishTimestamp": 1794931200,
           "source": {
             "type": "git",
-            "url": "https://github.com/GITHUB_USER/dsh-sanming-pet",
+            "url": "https://github.com/lin7397100/dsh-sanming-pet",
             "commit": "64d81b79208ee169edb52f082889aa200d86f891"
           },
           "engines": {
