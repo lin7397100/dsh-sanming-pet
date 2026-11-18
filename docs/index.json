@@ -69,7 +69,7 @@
           "source": {
             "type": "git",
             "url": "https://github.com/GITHUB_USER/dsh-sanming-pet",
-            "commit": "39b22d62792fcafe75bcafab50e73ea1b8af0c32"
+            "commit": "64d81b79208ee169edb52f082889aa200d86f891"
           },
           "engines": {
             "dsh": ">=0.2.0-rc.2"
