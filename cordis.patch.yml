@@ -1,0 +1,22 @@
+# 三明文旅乐园（dsh-sanming-pet）的 Bundle 补丁层
+#
+# 这个插件做两件事：
+#   - 宿主半（lib/host.js）：只依赖 Node 内置模块，挂宿主同源 API
+#       GET  /api/sanming-pet/scenes  景区/皮肤/成就的静态数据（前端渲染用）
+#       GET  /api/sanming-pet/state   读档：打卡记录、时间戳、穿戴皮肤
+#       POST /api/sanming-pet/checkin 打卡（幂等，重复打卡不重复计数）
+#       POST /api/sanming-pet/skin    穿戴/解锁皮肤
+#       POST /api/sanming-pet/reset   一键重置存档
+#       POST /api/sanming-pet/chat    三层知识库路由问答（平台故障 > 三明旅游 > 联网兜底）
+#     存档落在数据目录的 state.json，原子写入（先写 .tmp 再 rename）
+#   - 浏览器半（lib/client.js）：往侧边栏面板列表加一行「三明文旅乐园」，
+#     点开是以三明地图为背景的乐园：三只宠物巡游十景区、点击放大详情、
+#     打卡印章、成就、皮肤商店、打卡相册、漫游引导、礼花、宠物对话
+#
+# dataDir 留空时按顺序尝试：
+#   $SANMING_PET_DIR → $DSH_HOME/sanming-pet → /data/dsh-users/230012/.dsh/sanming-pet → $HOME/.dsh/sanming-pet
+- insert:
+    - id: sanming-pet
+      name: dsh-sanming-pet
+      config:
+        dataDir: ""
