@@ -32,7 +32,7 @@
     "chibi"
   ],
   "author": "林啟西",
-  "license": "UNLICENSED",
+  "license": "MIT",
   "engines": {
     "dsh": ">=0.2.0-rc.2"
   },
@@ -46,5 +46,13 @@
         "@deepseek-ai/dsh-client-ui-sidebar"
       ]
     }
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/GITHUB_USER/dsh-sanming-pet.git"
+  },
+  "homepage": "https://github.com/GITHUB_USER/dsh-sanming-pet#readme",
+  "bugs": {
+    "url": "https://github.com/GITHUB_USER/dsh-sanming-pet/issues"
   }
 }
