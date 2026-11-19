@@ -64,12 +64,12 @@
       },
       "versions": [
         {
-          "version": "1.9.5",
-          "publishTimestamp": 1795047300,
+          "version": "1.9.6",
+          "publishTimestamp": 1795048611,
           "source": {
             "type": "git",
             "url": "https://github.com/lin7397100/dsh-sanming-pet",
-            "commit": "7bdd38daeaaabc29075e9a8b66cbc2bdebc23bbe"
+            "commit": "e922f7f48705bf02b4fe526e17e15a7012db255f"
           },
           "engines": {
             "dsh": ">=0.2.0-rc.2"
