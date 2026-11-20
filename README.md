@@ -39,22 +39,32 @@ dsh plugin add dsh-sanming-pet@1.9.0
 
 不用装 DSH、不用管 Node，下载一个 exe 双击就能用：
 
-**[下载 SanmingPet-Setup-1.9.16.exe](dist/SanmingPet-Setup-1.9.16.exe)**（约 38 MB）
+**[下载 SanmingPet-Setup-1.9.17.exe](dist/SanmingPet-Setup-1.9.17.exe)**（约 38 MB）
 
-1. 双击 `SanmingPet-Setup-1.9.16.exe`
+1. 双击 `SanmingPet-Setup-1.9.17.exe`
 2. 点「立即安装」，默认装到 `%LOCALAPPDATA%\SanmingPetOverlay`，想换位置点「更改…」
 3. 勾上「开机自动启动」，登录后会自动贴上桌宠
-4. 装完桌面多一个「三明文旅浮窗」快捷方式，双击启动；`Ctrl+Alt+K` 打开本地知识库
+4. 装完桌面多一个「三明文旅浮窗」快捷方式，双击启动；开始菜单里也有一份（关掉之后从开始菜单还能搜到）；`Ctrl+Alt+K` 打开本地知识库
 
-安装包做的事：解包 140 个文件到目标目录 → 建桌面（以及可选的开机自启）快捷方式 → 在「设置 → 应用」里登记一条卸载项 → 拉起浮窗。
+安装包做的事：解包 140 个文件到目标目录 → 建桌面 + 开始菜单（以及可选的开机自启）快捷方式 → 在「设置 → 应用」里登记一条卸载项 → 拉起浮窗。
 
-卸载：再跑一次这个 exe 加 `/uninstall`（或在「设置 → 应用」里找到「三明文旅浮窗」点卸载）。
+**关掉 / 再打开 / 卸载是三件事**：
+
+| 你想要 | 怎么做 |
+|---|---|
+| 今天不想看见它 | 点宠物 → 设置面板右下角「关闭浮窗」→ 进程直接结束，桌面上干净，任务栏不留托盘图标 |
+| 再打开 | 双击桌面「三明文旅浮窗」，或在开始菜单搜「三明文旅浮窗」 |
+| 开机不想让它自己冒出来 | 删 `shell:startup` 里的「三明文旅浮窗.lnk」，或重装时不勾「开机自动启动」 |
+| 彻底不要了 | 再跑一次这个 exe 加 `/uninstall`（或在「设置 → 应用」里找到「三明文旅浮窗」点卸载） |
+
+> 关掉只是结束进程：绑过的文件夹、模型设置、宠物位置都存在 `data\` 里，下次打开原样恢复。
+> 双击两次不会叠出两只宠物——脚本带单实例锁，第二次启动会自己退出。
 
 命令行静默安装（批量分发用）：
 
 ```sh
-SanmingPet-Setup-1.9.16.exe -silent -autostart
-SanmingPet-Setup-1.9.16.exe -silent -nolaunch -target "D:\Tools\SanmingPet"
+SanmingPet-Setup-1.9.17.exe -silent -autostart
+SanmingPet-Setup-1.9.17.exe -silent -nolaunch -target "D:\Tools\SanmingPet"
 ```
 
 浮窗运行时会优先找 PowerShell 7（`pwsh`：scoop / Program Files / PATH），找不到才退回系统自带的 Windows PowerShell。想让界面和检索都稳，建议先装 [PowerShell 7](https://github.com/PowerShell/PowerShell/releases)。
@@ -62,11 +72,11 @@ SanmingPet-Setup-1.9.16.exe -silent -nolaunch -target "D:\Tools\SanmingPet"
 校验值：
 
 ```
-SHA256  F582CF4C38E2687B1535DBB6C1AF0165EAC815451987CFB152EE9810ADA2D83F
-MD5     CF9B25BC1E8D898C6BC56D1C7F0F2B9E
+SHA256  EC8343A84D076EB5A1DD99FC152658711F7B5FC6BF3E0BF4A867E7B63AE4D07D
+MD5     E2993B8EEBB0D1CA3D266AD275C6E649
 ```
 
-> 桌面版 1.9.16 这次只改了浮窗里的知识库面板（绑定按钮、文件夹列表），DSH 插件版本仍是 1.9.15。
+> 桌面版 1.9.17 改了三处：知识库面板的「＋ 绑定文件夹」按钮与文件夹列表改成实心胶囊 / 白色圆角卡片（1.9.16）；设置面板右下角加了「关闭浮窗」按钮，点一下真结束进程（1.9.17）；安装时同时建开始菜单快捷方式，并加了单实例锁防止叠出两只宠物。DSH 插件版本仍是 1.9.15。
 >
 > 安装包没有做代码签名（个人项目没有证书），第一次运行时 Windows 可能弹「SmartScreen 已阻止」：点「更多信息」→「仍要运行」即可。介意的话可以直接用方式 A，或用下面的命令行静默安装。
 
