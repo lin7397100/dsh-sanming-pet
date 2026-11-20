@@ -12,7 +12,14 @@
 - **知识库问答**：内置三明本地底稿检索，命中不到时可按配置走联网兜底；也可在设置页接自己的 MCP 知识库
 - **设置页**：宠物选择、尺寸、边距、MCP 连接管理（URL / Token / 知识库 ID / 超时）
 
-## 安装
+## 安装（二选一）
+
+两种用法互相独立，按你手上有什么选一种就行：
+
+- **要接进 DSH**（侧边栏「三明文旅乐园」+ 悬浮桌宠 + 知识库）：装 DSH 插件 → 方式 A
+- **只想在 Windows 桌面上养一只**（不装 DSH，双击就装）：用桌面版安装包 → 方式 B
+
+### 方式 A：装成 DSH 插件
 
 插件市场索引里点「安装」，或直接：
 
@@ -27,6 +34,37 @@ dsh plugin add dsh-sanming-pet@1.9.0
 ```
 
 装完重启当前 profile 的 DSH 实例即可，侧边栏会出现「三明文旅乐园」入口，设置页会多一项同名配置。
+
+### 方式 B：Windows 桌面版（单个 exe，双击即装）
+
+不用装 DSH、不用管 Node，下载一个 exe 双击就能用：
+
+**[下载 SanmingPet-Setup-1.9.15.exe](dist/SanmingPet-Setup-1.9.15.exe)**（约 38 MB）
+
+1. 双击 `SanmingPet-Setup-1.9.15.exe`
+2. 点「立即安装」，默认装到 `%LOCALAPPDATA%\SanmingPetOverlay`，想换位置点「更改…」
+3. 勾上「开机自动启动」，登录后会自动贴上桌宠
+4. 装完桌面多一个「三明文旅浮窗」快捷方式，双击启动；`Ctrl+Alt+K` 打开本地知识库
+
+安装包做的事：解包 140 个文件到目标目录 → 建桌面（以及可选的开机自启）快捷方式 → 在「设置 → 应用」里登记一条卸载项 → 拉起浮窗。
+
+卸载：再跑一次这个 exe 加 `/uninstall`（或在「设置 → 应用」里找到「三明文旅浮窗」点卸载）。
+
+命令行静默安装（批量分发用）：
+
+```sh
+SanmingPet-Setup-1.9.15.exe -silent -autostart
+SanmingPet-Setup-1.9.15.exe -silent -nolaunch -target "D:\Tools\SanmingPet"
+```
+
+浮窗运行时会优先找 PowerShell 7（`pwsh`：scoop / Program Files / PATH），找不到才退回系统自带的 Windows PowerShell。想让界面和检索都稳，建议先装 [PowerShell 7](https://github.com/PowerShell/PowerShell/releases)。
+
+校验值：
+
+```
+SHA256  FE80AAB15AEBFB9F49D67848594B6177031994BB3C17BC015E1A250F55142EF5
+MD5     31345E2B088C4D05A3FB558C8F5992CD
+```
 
 ## 配置
 
