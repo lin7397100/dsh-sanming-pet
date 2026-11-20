@@ -39,9 +39,9 @@ dsh plugin add dsh-sanming-pet@1.9.0
 
 不用装 DSH、不用管 Node，下载一个 exe 双击就能用：
 
-**[下载 SanmingPet-Setup-1.9.15.exe](dist/SanmingPet-Setup-1.9.15.exe)**（约 38 MB）
+**[下载 SanmingPet-Setup-1.9.16.exe](dist/SanmingPet-Setup-1.9.16.exe)**（约 38 MB）
 
-1. 双击 `SanmingPet-Setup-1.9.15.exe`
+1. 双击 `SanmingPet-Setup-1.9.16.exe`
 2. 点「立即安装」，默认装到 `%LOCALAPPDATA%\SanmingPetOverlay`，想换位置点「更改…」
 3. 勾上「开机自动启动」，登录后会自动贴上桌宠
 4. 装完桌面多一个「三明文旅浮窗」快捷方式，双击启动；`Ctrl+Alt+K` 打开本地知识库
@@ -53,8 +53,8 @@ dsh plugin add dsh-sanming-pet@1.9.0
 命令行静默安装（批量分发用）：
 
 ```sh
-SanmingPet-Setup-1.9.15.exe -silent -autostart
-SanmingPet-Setup-1.9.15.exe -silent -nolaunch -target "D:\Tools\SanmingPet"
+SanmingPet-Setup-1.9.16.exe -silent -autostart
+SanmingPet-Setup-1.9.16.exe -silent -nolaunch -target "D:\Tools\SanmingPet"
 ```
 
 浮窗运行时会优先找 PowerShell 7（`pwsh`：scoop / Program Files / PATH），找不到才退回系统自带的 Windows PowerShell。想让界面和检索都稳，建议先装 [PowerShell 7](https://github.com/PowerShell/PowerShell/releases)。
@@ -62,10 +62,12 @@ SanmingPet-Setup-1.9.15.exe -silent -nolaunch -target "D:\Tools\SanmingPet"
 校验值：
 
 ```
-SHA256  FE80AAB15AEBFB9F49D67848594B6177031994BB3C17BC015E1A250F55142EF5
-MD5     31345E2B088C4D05A3FB558C8F5992CD
+SHA256  F582CF4C38E2687B1535DBB6C1AF0165EAC815451987CFB152EE9810ADA2D83F
+MD5     CF9B25BC1E8D898C6BC56D1C7F0F2B9E
 ```
 
+> 桌面版 1.9.16 这次只改了浮窗里的知识库面板（绑定按钮、文件夹列表），DSH 插件版本仍是 1.9.15。
+>
 > 安装包没有做代码签名（个人项目没有证书），第一次运行时 Windows 可能弹「SmartScreen 已阻止」：点「更多信息」→「仍要运行」即可。介意的话可以直接用方式 A，或用下面的命令行静默安装。
 
 ## 配置
