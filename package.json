@@ -1,0 +1,58 @@
+{
+  "name": "dsh-sanming-pet",
+  "version": "1.9.19",
+  "type": "module",
+  "description": "三明文旅乐园：明奇奇/明灵灵/明宝宝 三只 3D 手办质感宠物，手绘三明地图巡游与 11 区县景区打卡，含打卡印章/成就/皮肤/相册/漫游引导，以及常驻悬浮桌宠（可拖拽、点击对话、设置页）和本地知识库问答。",
+  "main": "./lib/host.js",
+  "exports": {
+    ".": {
+      "default": "./lib/host.js"
+    },
+    "./client": {
+      "default": "./lib/client.js"
+    },
+    "./locale/*.json": "./locale/*.json",
+    "./package.json": "./package.json",
+    "./assets/*": "./lib/assets/*"
+  },
+  "files": [
+    "lib",
+    "locale",
+    "cordis.patch.yml",
+    "README.md"
+  ],
+  "keywords": [
+    "dsh",
+    "dsh-plugin",
+    "desktop-pet",
+    "sanming",
+    "三明",
+    "桌宠",
+    "文旅",
+    "chibi"
+  ],
+  "author": "林啟西",
+  "license": "MIT",
+  "engines": {
+    "dsh": ">=0.2.0-rc.2"
+  },
+  "dsh": {
+    "bundle": {
+      "patch": "./cordis.patch.yml"
+    },
+    "client": {
+      "platform": "web",
+      "inject": [
+        "@deepseek-ai/dsh-client-ui-sidebar"
+      ]
+    }
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/lin7397100/dsh-sanming-pet.git"
+  },
+  "homepage": "https://github.com/lin7397100/dsh-sanming-pet#readme",
+  "bugs": {
+    "url": "https://github.com/lin7397100/dsh-sanming-pet/issues"
+  }
+}
