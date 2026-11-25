@@ -47,14 +47,14 @@ dsh plugin add file:/绝对路径/dsh-sanming-pet-1.9.20.tgz
 
 不用装 DSH、不用管 Node，下载一个 exe 双击就能用：
 
-**[下载 SanmingPet-Setup-1.9.19.exe](dist/SanmingPet-Setup-1.9.19.exe)**（约 38 MB）
+**[下载 SanmingPet-Setup-1.9.20.exe](dist/SanmingPet-Setup-1.9.20.exe)**（约 38 MB）
 
-1. 双击 `SanmingPet-Setup-1.9.19.exe`
+1. 双击 `SanmingPet-Setup-1.9.20.exe`
 2. 点「立即安装」，默认装到 `%LOCALAPPDATA%\SanmingPetOverlay`，想换位置点「更改…」
 3. 勾上「开机自动启动」，登录后会自动贴上桌宠
 4. 装完桌面多一个「三明文宠」快捷方式（图标是明奇奇的头像，不是 PowerShell 蓝底图标），双击启动；开始菜单里也有一份（关掉之后从开始菜单还能搜到）；`Ctrl+Alt+K` 打开本地知识库
 
-安装包做的事：解包 140 个文件到目标目录 → 建桌面 + 开始菜单（以及可选的开机自启）快捷方式 → 在「设置 → 应用」里登记一条卸载项 → 拉起浮窗。
+安装包做的事：解包 141 个文件到目标目录 → 建桌面 + 开始菜单（以及可选的开机自启）快捷方式 → 在「设置 → 应用」里登记一条卸载项 → 拉起浮窗。
 
 **关掉 / 再打开 / 卸载是三件事**：
 
@@ -71,8 +71,8 @@ dsh plugin add file:/绝对路径/dsh-sanming-pet-1.9.20.tgz
 命令行静默安装（批量分发用）：
 
 ```sh
-SanmingPet-Setup-1.9.19.exe -silent -autostart
-SanmingPet-Setup-1.9.19.exe -silent -nolaunch -target "D:\Tools\SanmingPet"
+SanmingPet-Setup-1.9.20.exe -silent -autostart
+SanmingPet-Setup-1.9.20.exe -silent -nolaunch -target "D:\Tools\SanmingPet"
 ```
 
 浮窗运行时会优先找 PowerShell 7（`pwsh`：scoop / Program Files / PATH），找不到才退回系统自带的 Windows PowerShell。想让界面和检索都稳，建议先装 [PowerShell 7](https://github.com/PowerShell/PowerShell/releases)。
@@ -80,10 +80,12 @@ SanmingPet-Setup-1.9.19.exe -silent -nolaunch -target "D:\Tools\SanmingPet"
 校验值：
 
 ```
-SHA256  7BE6C255AD511E1DF4C07C0CFC1A6D1EA905263FD78F2C0E160BF3896DD6D30F
-MD5     F379F9482E82AD44E92FF4416F4D72B6
+SHA256  06DDF4DB3A541D5135D0776A307A2FF9606B45E2BE9DFD3E274995D8B5C87CA3
+MD5     B85E79C4BABAE8C924AB21CE8D30F61D
 ```
 
+> 桌面版 1.9.20：修了两处。一是知识库答案卡里的 markdown 表格（`| 序号 | 姓名 | …`）现在渲染成真表格（表头底色、细边框、按列宽、`:---:` 对齐、`<br>` 换行），原文片段卡也不再显示竖线和 `| --- |`；二是安装器在 SAG 检索服务占用 `tools\sag\sag.exe` 时会卡在 robocopy 默认「重试一百万次」上——现在安装前先停掉 sag 进程，并改用 `/R:2 /W:2`。
+>
 > 桌面版 1.9.19：在 1.9.18（快捷方式改名「三明文宠」、图标换成明奇奇头像）基础上，修了安装器三处、卸载残留与知识库中文乱码（`assets/icon/sanmingpet.ico`，6 个尺寸），不再是 PowerShell 的蓝底图标；卸载项、安装器标题也同步改名。
 >
 > 1.9.19 起：平台运维类问答整体移出发布包 —— 原来那份内部排障资料带着部署细节与运维命令，不适合对外分发；问答只剩三元区深度库 → 三明十景区 → 联网兜底。同版修掉了中文绑定目录在知识库面板里显示乱码的问题。1.9.17 加了「关闭浮窗」按钮、开始菜单入口与单实例锁；1.9.16 是知识库面板美化（绑定按钮、文件夹列表）。
