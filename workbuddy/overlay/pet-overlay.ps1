@@ -2141,13 +2141,16 @@ function Get-TextNoMd([string]$s) {
   $s = $s -replace '(?m)^\s*[-*+]\s+', '· '
   $s = $s -replace '!\[([^\]]*)\]\([^)]*\)', '$1'
   $s = $s -replace '\[([^\]]+)\]\([^)]+\)', '$1'
+  $s = $s -replace '(?m)^\s*\|?\s*:?-{3,}[-\s:|]*$', ''
+  $s = $s -replace '\|', ' '
+  $s = $s -replace '[ \t]{2,}', ' '
   $s = $s -replace '[*`_]', ''
   return $s.Trim()
 }
 
 # 行内 **粗体** 与 `代码` 拆成 Run，塞进同一个 TextBlock
 function Add-InlineMd([System.Windows.Controls.TextBlock]$tb, [string]$text, [double]$size, [string]$fg) {
-  $rx = [regex]'\*\*(?<b>.+?)\*\*|`(?<c>.+?)`|\[(?<n>\d+)\]'
+  $rx = [regex]'\*\*(?<b>.+?)\*\*|`(?<c>.+?)`|\[(?<n>\d+)\]|<br\s*/?>'
   $pos = 0
   foreach ($m in $rx.Matches($text)) {
     if ($m.Index -gt $pos) {
@@ -2166,6 +2169,8 @@ function Add-InlineMd([System.Windows.Controls.TextBlock]$tb, [string]$text, [do
       $r.FontSize = ($size - 0.3)
       $r.FontFamily = (New-Object System.Windows.Media.FontFamily 'Consolas, Microsoft YaHei')
       $r.Foreground = (New-Brush '#2F6B45')
+    } elseif ($m.Value -match '^<br') {
+      $tb.Inlines.Add((New-Object System.Windows.Documents.LineBreak)) | Out-Null
     } else {
       # 引用编号 [1] 做成绿色小标记，而不是跟着正文一个颜色
       $r = New-Object System.Windows.Documents.Run ('[' + $m.Groups['n'].Value + ']')
@@ -2183,12 +2188,129 @@ function Add-InlineMd([System.Windows.Controls.TextBlock]$tb, [string]$text, [do
   }
 }
 
-# 整段 markdown 渲染成 StackPanel：标题 / 无序列表 / 编号列表 / 引用 / 代码块
+# 把 | a | b | 形式的表格行拆成单元格（支持 \| 转义、首尾竖线可省）
+function Split-MdTableRow([string]$line) {
+  $t = $line.Trim()
+  if ($t.StartsWith('|')) { $t = $t.Substring(1) }
+  if ($t.EndsWith('|')) { $t = $t.Substring(0, $t.Length - 1) }
+  $cells = New-Object System.Collections.Generic.List[string]
+  $sb = New-Object System.Text.StringBuilder
+  $esc = $false
+  foreach ($ch in $t.ToCharArray()) {
+    if ($esc) { [void]$sb.Append($ch); $esc = $false; continue }
+    if ($ch -eq '\') { $esc = $true; continue }
+    if ($ch -eq '|') { $cells.Add($sb.ToString().Trim()); [void]$sb.Clear(); continue }
+    [void]$sb.Append($ch)
+  }
+  $cells.Add($sb.ToString().Trim())
+  return ,$cells.ToArray()
+}
+
+# 形如 | --- | :---: | ---: | 的分隔行才算表格，普通带竖线的句子不当表格
+function Test-MdTableSep([string]$line) {
+  $t = $line.Trim()
+  if ($t -eq '' -or $t -notmatch '--') { return $false }
+  if ($t -notmatch '^[\s|:\-]+$') { return $false }
+  if (($t -split '\|').Count -lt 2) { return $false }
+  return $true
+}
+
+# 渲染成真正的 WPF 表格：表头底色、细边框、按每列内容长度分配宽度、按 :---: 对齐
+function New-MdTable([string[]]$rows, [double]$size, [string]$fg) {
+  $outer = New-Object System.Windows.Controls.Border
+  $outer.BorderBrush = (New-Brush '#DCE8E0')
+  $outer.BorderThickness = (New-Object System.Windows.Thickness 1)
+  $outer.CornerRadius = (New-Object System.Windows.CornerRadius 3)
+  $outer.Background = (New-Brush '#FFFFFF')
+  $outer.Margin = (New-Object System.Windows.Thickness 0, 3, 0, 7)
+  if ($rows.Count -lt 2) { return $outer }
+
+  $parsed = New-Object System.Collections.Generic.List[object]
+  foreach ($r in $rows) { $parsed.Add((Split-MdTableRow $r)) }
+
+  $cols = 1
+  foreach ($p in $parsed) { if ($p.Count -gt $cols) { $cols = $p.Count } }
+
+  # 列宽按该列最长内容分配，避免"序号"占掉一半宽度
+  $grid = New-Object System.Windows.Controls.Grid
+  for ($c = 0; $c -lt $cols; $c++) {
+    $maxLen = 4
+    foreach ($p in $parsed) {
+      if ($c -lt $p.Count) {
+        $l = ($p[$c] -replace '<[^>]+>', '').Length
+        if ($l -gt $maxLen) { $maxLen = $l }
+      }
+    }
+    $w = [Math]::Min([Math]::Max($maxLen, 3), 36)
+    $cd = New-Object System.Windows.Controls.ColumnDefinition
+    $cd.Width = New-Object System.Windows.GridLength ([double]$w), ([System.Windows.GridUnitType]::Star)
+    $grid.ColumnDefinitions.Add($cd) | Out-Null
+  }
+
+  $aligns = @()
+  $sepCells = Split-MdTableRow $rows[1]
+  for ($c = 0; $c -lt $cols; $c++) {
+    $a = 'left'
+    if ($c -lt $sepCells.Count) {
+      $s = [string]$sepCells[$c]
+      if ($s.StartsWith(':') -and $s.EndsWith(':')) { $a = 'center' }
+      elseif ($s.EndsWith(':')) { $a = 'right' }
+    }
+    $aligns += $a
+  }
+
+  for ($k = 0; $k -lt ($parsed.Count - 1); $k++) {
+    $rd = New-Object System.Windows.Controls.RowDefinition
+    $grid.RowDefinitions.Add($rd) | Out-Null
+  }
+
+  for ($r = 0; $r -lt $parsed.Count; $r++) {
+    if ($r -eq 1) { continue }   # 跳过分隔行
+    $isHeader = ($r -eq 0)
+    $gridRow = if ($isHeader) { 0 } else { $r - 1 }
+    for ($c = 0; $c -lt $cols; $c++) {
+      $text = ''
+      if ($c -lt $parsed[$r].Count) { $text = [string]$parsed[$r][$c] }
+      $bg = if ($isHeader) { '#EDF4EF' } elseif ($gridRow % 2 -eq 1) { '#F8FBF9' } else { '#FFFFFF' }
+      $b = New-Object System.Windows.Controls.Border
+      $b.Background = (New-Brush $bg)
+      $b.BorderBrush = (New-Brush '#E3EDE7')
+      $b.BorderThickness = (New-Object System.Windows.Thickness 0, 0, 1, 1)
+      $tb = New-Object System.Windows.Controls.TextBlock
+      $tb.TextWrapping = 'Wrap'
+      $tb.FontSize = ($size - 1.2)
+      $tb.LineHeight = ($size + 3.5)
+      $tb.Padding = (New-Object System.Windows.Thickness 6, 3, 6, 3)
+      if ($isHeader) {
+        $tb.FontWeight = 'Bold'
+        $tb.Foreground = (New-Brush '#2F6B45')
+        Add-InlineMd $tb $text $tb.FontSize '#2F6B45'
+      } else {
+        $tb.Foreground = (New-Brush $fg)
+        Add-InlineMd $tb $text $tb.FontSize $fg
+      }
+      $al = if ($c -lt $aligns.Count) { $aligns[$c] } else { 'left' }
+      if ($al -eq 'center') { $tb.TextAlignment = 'Center' }
+      elseif ($al -eq 'right') { $tb.TextAlignment = 'Right' }
+      $b.Child = $tb
+      [System.Windows.Controls.Grid]::SetColumn($b, $c)
+      [System.Windows.Controls.Grid]::SetRow($b, $gridRow)
+      $grid.Children.Add($b) | Out-Null
+    }
+  }
+
+  $outer.Child = $grid
+  return $outer
+}
+
+# 整段 markdown 渲染成 StackPanel：标题 / 无序列表 / 编号列表 / 引用 / 代码块 / 表格
 function New-MarkdownPanel([string]$md, [double]$size, [string]$fg) {
   $sp = New-Object System.Windows.Controls.StackPanel
   if ([string]::IsNullOrEmpty($md)) { return $sp }
   $inCode = $false
-  foreach ($raw in ($md -split "`r?`n")) {
+  $lines = @($md -split "`r?`n")
+  for ($i = 0; $i -lt $lines.Count; $i++) {
+    $raw = $lines[$i]
     $t = $raw.Trim()
     if ($t -match '^`{3,}') { $inCode = -not $inCode; continue }
     if ($t -eq '') { continue }
@@ -2203,6 +2325,26 @@ function New-MarkdownPanel([string]$md, [double]$size, [string]$fg) {
       $c.Margin = (New-Object System.Windows.Thickness 0, 0, 0, 1)
       $sp.Children.Add($c) | Out-Null
       continue
+    }
+
+    # 表格：当前行是表头，下一行是 | --- | 分隔行，就一路吃到不是表格行为止
+    if ($t.Contains('|')) {
+      $nextT = if ($i + 1 -lt $lines.Count) { $lines[$i + 1].Trim() } else { '' }
+      if ((Test-MdTableSep $nextT) -and ($t -notmatch '^`{3,}')) {
+        $tbl = New-Object System.Collections.Generic.List[string]
+        $tbl.Add($t)
+        $i++
+        $tbl.Add($lines[$i].Trim())
+        while ($i + 1 -lt $lines.Count) {
+          $nxt = $lines[$i + 1].Trim()
+          if ($nxt -eq '' -or -not $nxt.Contains('|')) { break }
+          if ($nxt -match '^`{3,}') { break }
+          $i++
+          $tbl.Add($nxt)
+        }
+        $sp.Children.Add((New-MdTable $tbl.ToArray() $size $fg)) | Out-Null
+        continue
+      }
     }
 
     $hm = [regex]::Match($t, '^(#{1,6})\s*(.+)$')
@@ -2401,7 +2543,7 @@ function Start-KbAnswer([string]$q, $hits, $list) {
 1. 只能依据用户给出的片段作答，不许使用片段以外的任何知识，不许补充片段里没有的细节。
 2. 片段不足以回答时，直接回复「知识库里没有找到能回答这个问题的内容」，不要猜测，也不要给方向性建议。
 3. 回答中每个事实后面必须标注来源编号，如 [1]；编号只能来自给出的片段。
-5. 可以用简单 markdown：加粗、无序列表、小标题，但不要用表格。
+5. 可以用简单 markdown：加粗、无序列表、小标题；原文是表格时可以用竖线表格（表头一行，第二行 | --- |），不要合并单元格、不要嵌套表格。
 4. 用简洁的书面中文，不要复述问题，不要写"根据片段""以下是"这类开场。
 '@
   $usr = "片段：`n`n$($ctxInfo.ctx)`n`n问题：$q"
