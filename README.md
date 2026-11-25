@@ -47,9 +47,9 @@ dsh plugin add file:/绝对路径/dsh-sanming-pet-1.9.20.tgz
 
 不用装 DSH、不用管 Node，下载一个 exe 双击就能用：
 
-**[下载 SanmingPet-Setup-1.9.20.exe](dist/SanmingPet-Setup-1.9.20.exe)**（约 38 MB）
+**[下载 SanmingPet-Setup-1.9.21.exe](dist/SanmingPet-Setup-1.9.21.exe)**（约 38 MB）
 
-1. 双击 `SanmingPet-Setup-1.9.20.exe`
+1. 双击 `SanmingPet-Setup-1.9.21.exe`
 2. 点「立即安装」，默认装到 `%LOCALAPPDATA%\SanmingPetOverlay`，想换位置点「更改…」
 3. 勾上「开机自动启动」，登录后会自动贴上桌宠
 4. 装完桌面多一个「三明文宠」快捷方式（图标是明奇奇的头像，不是 PowerShell 蓝底图标），双击启动；开始菜单里也有一份（关掉之后从开始菜单还能搜到）；`Ctrl+Alt+K` 打开本地知识库
@@ -71,8 +71,8 @@ dsh plugin add file:/绝对路径/dsh-sanming-pet-1.9.20.tgz
 命令行静默安装（批量分发用）：
 
 ```sh
-SanmingPet-Setup-1.9.20.exe -silent -autostart
-SanmingPet-Setup-1.9.20.exe -silent -nolaunch -target "D:\Tools\SanmingPet"
+SanmingPet-Setup-1.9.21.exe -silent -autostart
+SanmingPet-Setup-1.9.21.exe -silent -nolaunch -target "D:\Tools\SanmingPet"
 ```
 
 浮窗运行时会优先找 PowerShell 7（`pwsh`：scoop / Program Files / PATH），找不到才退回系统自带的 Windows PowerShell。想让界面和检索都稳，建议先装 [PowerShell 7](https://github.com/PowerShell/PowerShell/releases)。
@@ -80,11 +80,11 @@ SanmingPet-Setup-1.9.20.exe -silent -nolaunch -target "D:\Tools\SanmingPet"
 校验值：
 
 ```
-SHA256  06DDF4DB3A541D5135D0776A307A2FF9606B45E2BE9DFD3E274995D8B5C87CA3
-MD5     B85E79C4BABAE8C924AB21CE8D30F61D
+SHA256  732704136629D44E6054E4F1DE6F7F5F2C33D1470CD83A564859E26A5AE21B0A
+MD5     1FF7D235873674D6E4E32F0E4155C386
 ```
 
-> 桌面版 1.9.20：修了两处。一是知识库答案卡里的 markdown 表格（`| 序号 | 姓名 | …`）现在渲染成真表格（表头底色、细边框、按列宽、`:---:` 对齐、`<br>` 换行），原文片段卡也不再显示竖线和 `| --- |`；二是安装器在 SAG 检索服务占用 `tools\sag\sag.exe` 时会卡在 robocopy 默认「重试一百万次」上——现在安装前先停掉 sag 进程，并改用 `/R:2 /W:2`。
+> 桌面版 1.9.21：浮窗里两张卡（答案卡、原文片段卡）的 markdown 表格现在都画成真表格 —— 表头底色、细边框、按列宽、`:---:` 对齐、单元格内 `<br>` 折行，关键词高亮也保留，不再把竖线和 `| --- |` 原样打出来（上一版只修了答案卡，原文片段还是挤成一行行文字）。另修安装器：SAG 服务占用 `tools\sag\sag.exe` 时 robocopy 会按默认「重试一百万次」卡死，现在复制前先停 sag，并加 `/R:2 /W:2`。
 >
 > 桌面版 1.9.19：在 1.9.18（快捷方式改名「三明文宠」、图标换成明奇奇头像）基础上，修了安装器三处、卸载残留与知识库中文乱码（`assets/icon/sanmingpet.ico`，6 个尺寸），不再是 PowerShell 的蓝底图标；卸载项、安装器标题也同步改名。
 >

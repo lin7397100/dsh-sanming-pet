@@ -1,4 +1,4 @@
-﻿# 三明文旅乐园 · WorkBuddy 贴边浮窗（可交互版）
+# 三明文旅乐园 · WorkBuddy 贴边浮窗（可交互版）
 #
 # 功能：
 #   - 左边景点照片卡片，轮播三元区 6 个景点；点照片用默认浏览器打开该景点详情
@@ -964,19 +964,19 @@ function New-KbCard($hit, [string[]]$tokens) {
   $meta.Text = $metaText
   $sp.Children.Add($meta) | Out-Null
 
-  $body = New-Object System.Windows.Controls.TextBlock
   if ($hit.readable -eq $false) {
     # PDF / Word 不是纯文本，按行号回读只会拿到乱码，这里如实说明
     $fmt = if ($hit.format) { [string]$hit.format } else { '该格式' }
     $note = "这是 $fmt 文件，已建立索引，但没有可预览的纯文本。点卡片用系统程序打开。"
+    $body = New-Object System.Windows.Controls.TextBlock
     Add-Highlight $body $note @() 11.2 '#7C8C82'
+    $sp.Children.Add($body) | Out-Null
   } else {
     $text = [string]$hit.text
     if ($text.Length -gt 340) { $text = $text.Substring(0, 340) + ' …' }
-    # 源文件是 md 的话，片段里全是 ** ## 这些标记，先清掉再高亮
-    Add-Highlight $body (Get-TextNoMd $text) $tokens 11.6 '#3E4F44'
+    # 片段里也可能有 md 表格：逐行渲染，表格行画成真表格，其余行照旧去标记 + 关键词高亮
+    $sp.Children.Add((New-SnippetBody $text $tokens 11.6 '#3E4F44')) | Out-Null
   }
-  $sp.Children.Add($body) | Out-Null
 
   $border.Child = $sp
   $path = [string]$hit.path
@@ -2216,7 +2216,7 @@ function Test-MdTableSep([string]$line) {
 }
 
 # 渲染成真正的 WPF 表格：表头底色、细边框、按每列内容长度分配宽度、按 :---: 对齐
-function New-MdTable([string[]]$rows, [double]$size, [string]$fg) {
+function New-MdTable([string[]]$rows, [double]$size, [string]$fg, [string[]]$tokens = @()) {
   $outer = New-Object System.Windows.Controls.Border
   $outer.BorderBrush = (New-Brush '#DCE8E0')
   $outer.BorderThickness = (New-Object System.Windows.Thickness 1)
@@ -2287,7 +2287,17 @@ function New-MdTable([string[]]$rows, [double]$size, [string]$fg) {
         Add-InlineMd $tb $text $tb.FontSize '#2F6B45'
       } else {
         $tb.Foreground = (New-Brush $fg)
-        Add-InlineMd $tb $text $tb.FontSize $fg
+        if ($tokens -and $tokens.Count -gt 0) {
+          # 原文卡里的表格：单元格内也要命中关键词高亮，<br> 折成换行
+          $segs = @($text -split '<br\s*/?>')
+          for ($si = 0; $si -lt $segs.Count; $si++) {
+            if ($si -gt 0) { $tb.Inlines.Add((New-Object System.Windows.Documents.LineBreak)) | Out-Null }
+            $segText = Get-TextNoMd $segs[$si]
+            if ($segText -ne '') { Add-Highlight $tb $segText $tokens $tb.FontSize $fg }
+          }
+        } else {
+          Add-InlineMd $tb $text $tb.FontSize $fg
+        }
       }
       $al = if ($c -lt $aligns.Count) { $aligns[$c] } else { 'left' }
       if ($al -eq 'center') { $tb.TextAlignment = 'Center' }
@@ -2301,6 +2311,39 @@ function New-MdTable([string[]]$rows, [double]$size, [string]$fg) {
 
   $outer.Child = $grid
   return $outer
+}
+
+# 原文片段：逐行渲染，遇到 md 表格就画成真表格（行内关键词照样高亮）
+function New-SnippetBody([string]$text, [string[]]$tokens, [double]$size, [string]$fg) {
+  $sp = New-Object System.Windows.Controls.StackPanel
+  if ([string]::IsNullOrEmpty($text)) { return $sp }
+  $lines = @($text -split "`r?`n")
+  for ($i = 0; $i -lt $lines.Count; $i++) {
+    $t = $lines[$i].Trim()
+    if ($t -eq '') { continue }
+    if ($t.Contains('|')) {
+      $nextT = if ($i + 1 -lt $lines.Count) { $lines[$i + 1].Trim() } else { '' }
+      if (Test-MdTableSep $nextT) {
+        $rows = New-Object System.Collections.Generic.List[string]
+        $rows.Add($t) | Out-Null
+        $i++
+        $rows.Add($lines[$i].Trim()) | Out-Null
+        while ($i + 1 -lt $lines.Count) {
+          $nxt = $lines[$i + 1].Trim()
+          if ($nxt -eq '' -or -not $nxt.Contains('|')) { break }
+          $i++
+          $rows.Add($nxt) | Out-Null
+        }
+        $sp.Children.Add((New-MdTable $rows.ToArray() $size $fg $tokens)) | Out-Null
+        continue
+      }
+    }
+    $tb = New-Object System.Windows.Controls.TextBlock
+    $tb.Margin = (New-Object System.Windows.Thickness 0, 0, 0, 3)
+    Add-Highlight $tb (Get-TextNoMd $t) $tokens $size $fg
+    $sp.Children.Add($tb) | Out-Null
+  }
+  return $sp
 }
 
 # 整段 markdown 渲染成 StackPanel：标题 / 无序列表 / 编号列表 / 引用 / 代码块 / 表格
